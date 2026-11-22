@@ -9,7 +9,7 @@
 | 3. Opslag en upsert | 2026-11-22 | 15 min |
 | 4. Bidirectionele integriteit | 2026-11-22 | 30 min |
 | 5. REST-endpoint | 2026-11-22 | 20 min |
-| 6. Performance | | |
+| 6. Performance | 2026-11-22 | 30 min |
 | 7. Fase 2 | | |
 | 8. Afronden | | |
 | **Totaal** | | |
