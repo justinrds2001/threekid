@@ -98,6 +98,13 @@ class PersonControllerIntegrationTest {
 	}
 
 	@Test
+	void rejectsUnknownFields() {
+		assertBadRequest("""
+				{"id": 1, "childern": [{"id": 10}]}
+				""");
+	}
+
+	@Test
 	void rejectsAPersonWhoIsTheirOwnPartner() {
 		assertBadRequest("""
 				{"id": 1, "partner": {"id": 1}}
