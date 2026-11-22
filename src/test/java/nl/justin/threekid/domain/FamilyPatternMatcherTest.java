@@ -57,6 +57,28 @@ class FamilyPatternMatcherTest {
 		assertThat(matcher.matches(candidate, people, TODAY)).isFalse();
 	}
 
+	@Test
+	void doesNotMatchWhenAllChildrenAre18OrOlder() {
+		assertThat(matches(PARTNER, child(10, ADULT), child(11, ADULT), child(12, ADULT))).isFalse();
+	}
+
+	@Test
+	void doesNotCountAChildWithUnknownBirthDateAsUnder18() {
+		assertThat(matches(PARTNER, child(10, null), child(11, ADULT), child(12, ADULT))).isFalse();
+	}
+
+	@Test
+	void matchesWhenAChildTurns18Tomorrow() {
+		var turns18Tomorrow = TODAY.minusYears(18).plusDays(1);
+		assertThat(matches(PARTNER, child(10, turns18Tomorrow), child(11, ADULT), child(12, ADULT))).isTrue();
+	}
+
+	@Test
+	void doesNotMatchWhenTheYoungestChildTurns18Today() {
+		var turns18Today = TODAY.minusYears(18);
+		assertThat(matches(PARTNER, child(10, turns18Today), child(11, ADULT), child(12, ADULT))).isFalse();
+	}
+
 	private boolean matches(PersonId partner, Person... children) {
 		var childIds = Arrays.stream(children).map(Person::id).collect(Collectors.toSet());
 		var candidate = new Person(CANDIDATE, "Candidate", ADULT, Set.of(), partner, childIds);

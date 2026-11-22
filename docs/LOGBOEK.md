@@ -20,4 +20,4 @@ Per open punt in de opdracht: de vraag, de opties die ik heb overwogen, mijn keu
 
 | # | Vraag | Overwogen | Keuze | Waarom |
 | --- | --- | --- | --- | --- |
-| 1 | | | | |
+| 1 | Telt een kind zonder geboortedatum als jonger dan 18? | Nee, of ja | Nee | Een match moet aantoonbaar kloppen. Zonder geboortedatum is niet te bewijzen dat het kind jonger is dan 18. |
