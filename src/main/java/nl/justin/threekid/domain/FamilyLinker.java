@@ -11,6 +11,7 @@ public class FamilyLinker {
 
 	public List<Person> link(Person incoming, Function<PersonId, Optional<Person>> lookup) {
 		var changes = new Changes(lookup);
+		unlinkLeftOut(incoming, changes.current(incoming.id()), changes);
 		changes.put(incoming);
 		incoming.children().forEach(child -> changes.update(child, c -> c.withParent(incoming.id())));
 		incoming.parents().forEach(parent -> changes.update(parent, p -> p.withChild(incoming.id())));
@@ -18,6 +19,19 @@ public class FamilyLinker {
 			linkPartner(incoming, changes);
 		}
 		return changes.toList();
+	}
+
+	private static void unlinkLeftOut(Person incoming, Person previous, Changes changes) {
+		var id = incoming.id();
+		previous.children().stream()
+				.filter(child -> !incoming.children().contains(child))
+				.forEach(child -> changes.update(child, c -> c.withoutParent(id)));
+		previous.parents().stream()
+				.filter(parent -> !incoming.parents().contains(parent))
+				.forEach(parent -> changes.update(parent, p -> p.withoutChild(id)));
+		if (previous.partner() != null && !previous.partner().equals(incoming.partner())) {
+			changes.update(previous.partner(), p -> p.withPartner(null));
+		}
 	}
 
 	private static void linkPartner(Person incoming, Changes changes) {

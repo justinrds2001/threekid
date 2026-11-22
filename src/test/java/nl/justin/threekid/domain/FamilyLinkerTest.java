@@ -56,6 +56,35 @@ class FamilyLinkerTest {
 		assertThat(result.get(CAROL).partner()).isNull();
 	}
 
+	@Test
+	void unlinksAChildTheUpdateLeavesOut() {
+		var result = link(person(ADA, Set.of(), Set.of()), person(ADA, Set.of(), Set.of(KID)), person(KID, Set.of(ADA), Set.of()));
+
+		assertThat(result.get(KID).parents()).isEmpty();
+	}
+
+	@Test
+	void unlinksAParentTheUpdateLeavesOut() {
+		var result = link(person(KID, Set.of(), Set.of()), person(KID, Set.of(ADA), Set.of()), person(ADA, Set.of(), Set.of(KID)));
+
+		assertThat(result.get(ADA).children()).isEmpty();
+	}
+
+	@Test
+	void unlinksAPartnerTheUpdateLeavesOut() {
+		var result = link(partnered(ADA, null), partnered(ADA, BOB), partnered(BOB, ADA));
+
+		assertThat(result.get(BOB).partner()).isNull();
+	}
+
+	@Test
+	void unlinksThePreviousPartnerWhenSwitchingPartners() {
+		var result = link(partnered(ADA, CAROL), partnered(ADA, BOB), partnered(BOB, ADA), partnered(CAROL, null));
+
+		assertThat(result.get(BOB).partner()).isNull();
+		assertThat(result.get(CAROL).partner()).isEqualTo(ADA);
+	}
+
 	private Map<PersonId, Person> link(Person incoming, Person... stored) {
 		var store = Arrays.stream(stored).collect(Collectors.toMap(Person::id, Function.identity()));
 		return linker.link(incoming, id -> Optional.ofNullable(store.get(id))).stream()
