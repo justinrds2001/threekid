@@ -28,7 +28,7 @@ public class PersonService {
 		this.clock = clock;
 	}
 
-	public List<Person> save(Person person) {
+	public synchronized List<Person> save(Person person) {
 		var changed = linker.link(person, repository::findById);
 		changed.forEach(repository::save);
 		changed.forEach(this::reassess);

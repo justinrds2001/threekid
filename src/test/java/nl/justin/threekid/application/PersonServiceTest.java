@@ -11,6 +11,9 @@ import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executors;
+import java.util.stream.IntStream;
 
 import org.junit.jupiter.api.Test;
 
@@ -158,6 +161,21 @@ class PersonServiceTest {
 		clock.advanceOneDay();
 
 		assertThat(service.save(person(new PersonId(99), "Unrelated"))).isEmpty();
+	}
+
+	@Test
+	void keepsEveryLinkWhenChildrenAreSavedAtTheSameTime() throws InterruptedException {
+		var children = 100;
+		var start = new CountDownLatch(1);
+		try (var executor = Executors.newFixedThreadPool(8)) {
+			IntStream.range(0, children).forEach(i -> executor.submit(() -> {
+				start.await();
+				return service.save(new Person(new PersonId(100 + i), null, null, Set.of(ADA), null, Set.of()));
+			}));
+			start.countDown();
+		}
+
+		assertThat(repository.findById(ADA)).map(person -> person.children().size()).contains(children);
 	}
 
 	private List<Person> saveFamily(LocalDate youngestBirthDate) {
