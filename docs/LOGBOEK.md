@@ -10,9 +10,9 @@
 | 4. Bidirectionele integriteit | 2026-11-22 | 30 min |
 | 5. REST-endpoint | 2026-11-22 | 20 min |
 | 6. Performance | 2026-11-22 | 30 min |
-| 7. Fase 2 | | |
-| 8. Afronden | | |
-| **Totaal** | | |
+| 7. Fase 2 | 2026-11-22 | Overgeslagen |
+| 8. Afronden (scan en README) | 2026-11-22 | 35 min |
+| **Totaal** | | **165 min (2 uur 45 min)** |
 
 ## Vragen en keuzes
 
@@ -37,3 +37,5 @@ Per open punt in de opdracht: de vraag, de opties die ik heb overwogen, mijn keu
 | 15 | Waar staat de set met matches? | Als veld in `PersonService`, in de repository-port, of in een eigen domeinklasse | Veld in `PersonService` | Eenvoudigst. De set verdwijnt bij een herstart, net als de in-memory data. |
 | 16 | Wie beoordeel je opnieuw na een POST? | Alleen de personen die de linker aanpaste, of ook hun ouders | Alleen wie de linker aanpaste | De linker raakt bij elke wijziging ook de ouders en de partner aan. Een extra regel voor de ouders deed niets wat een test kon aantonen, en de tests bewaken dat de linker dit blijft doen. |
 | 17 | Hoe maak je een POST atomair? | `synchronized` op `save`, een `ReentrantLock`, of een lock per familie | `synchronized` op `save` | Eén woord, en alle schrijfacties gaan na elkaar. Een POST duurt microseconden, dus dat is geen bottleneck. Een lock per familie is foutgevoelig omdat familiegrenzen bij elke update verschuiven. |
+| 18 | Fase 2 (`DELETE`) bouwen? | Bouwen, of overslaan en de aanpak beschrijven | Overslaan | Na stap 6 zat ik al boven de geschatte 2 uur. De aanpak staat in de README onder "With more time". |
+| 19 | Wat als de beoordelaar geen JDK 25 heeft? | Gradle de JDK laten downloaden (foojay-plugin), of alleen in de README noemen | Laten downloaden | Eén regel in `settings.gradle.kts`, en `./gradlew build` werkt dan op een schone machine. |
