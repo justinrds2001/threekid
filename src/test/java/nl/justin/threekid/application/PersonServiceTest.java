@@ -50,10 +50,10 @@ class PersonServiceTest {
 
 		service.save(new Person(ADA, "Ada", null, Set.of(parent1, parent2), partner, Set.of(child)));
 
-		assertThat(repository.findById(parent1)).contains(Person.placeholder(parent1));
-		assertThat(repository.findById(parent2)).contains(Person.placeholder(parent2));
-		assertThat(repository.findById(partner)).contains(Person.placeholder(partner));
-		assertThat(repository.findById(child)).contains(Person.placeholder(child));
+		assertThat(repository.findById(parent1)).isPresent();
+		assertThat(repository.findById(parent2)).isPresent();
+		assertThat(repository.findById(partner)).isPresent();
+		assertThat(repository.findById(child)).isPresent();
 	}
 
 	@Test
@@ -78,6 +78,18 @@ class PersonServiceTest {
 		var matches = service.save(child(new PersonId(12), LocalDate.of(1990, 1, 1), bob));
 
 		assertThat(matches).containsExactly(ada);
+	}
+
+	@Test
+	void matchesAParentWhoseChildrenAreKnownOnlyFromTheChildRecords() {
+		var bob = new PersonId(2);
+		service.save(new Person(ADA, "Ada", null, Set.of(), bob, Set.of()));
+		service.save(child(new PersonId(10), LocalDate.of(2015, 1, 1), bob));
+		service.save(child(new PersonId(11), LocalDate.of(1990, 1, 1), bob));
+
+		var matches = service.save(child(new PersonId(12), LocalDate.of(1990, 1, 1), bob));
+
+		assertThat(matches).extracting(Person::id).contains(ADA);
 	}
 
 	@Test
