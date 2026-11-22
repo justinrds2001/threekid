@@ -17,4 +17,8 @@ public record Person(
 		parents = Set.copyOf(parents);
 		children = Set.copyOf(children);
 	}
+
+	public static Person placeholder(PersonId id) {
+		return new Person(id, null, null, Set.of(), null, Set.of());
+	}
 }
