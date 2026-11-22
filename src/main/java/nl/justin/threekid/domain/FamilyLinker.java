@@ -3,13 +3,11 @@ package nl.justin.threekid.domain;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
 public class FamilyLinker {
 
-	public List<Person> link(Person incoming, Function<PersonId, Optional<Person>> lookup) {
+	public List<Person> link(Person incoming, PersonLookup lookup) {
 		var changes = new Changes(lookup);
 		unlinkLeftOut(incoming, changes.current(incoming.id()), changes);
 		changes.put(incoming);
@@ -45,9 +43,9 @@ public class FamilyLinker {
 	private static final class Changes {
 
 		private final Map<PersonId, Person> people = new LinkedHashMap<>();
-		private final Function<PersonId, Optional<Person>> lookup;
+		private final PersonLookup lookup;
 
-		Changes(Function<PersonId, Optional<Person>> lookup) {
+		Changes(PersonLookup lookup) {
 			this.lookup = lookup;
 		}
 
@@ -65,7 +63,7 @@ public class FamilyLinker {
 
 		Person current(PersonId id) {
 			var changed = people.get(id);
-			return changed != null ? changed : lookup.apply(id).orElseGet(() -> Person.placeholder(id));
+			return changed != null ? changed : lookup.find(id).orElseGet(() -> Person.placeholder(id));
 		}
 	}
 }

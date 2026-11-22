@@ -109,6 +109,6 @@ class FamilyPatternMatcherTest {
 		return new Person(new PersonId(id), null, birthDate, Set.of(CANDIDATE, otherParent), null, Set.of());
 	}
 
-	private record Family(Person candidate, Function<PersonId, Optional<Person>> lookup) {
+	private record Family(Person candidate, PersonLookup lookup) {
 	}
 }
