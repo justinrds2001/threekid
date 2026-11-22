@@ -15,7 +15,10 @@
 | Version | Average POST |
 | --- | --- |
 | Full scan after every POST | 385 µs |
+| Only reassess the people the POST changed | 165 µs |
 
 ## Approach and AI use
 
 ## With more time
+
+- Rebuild the set of matching people from storage at startup, once storage is persistent.

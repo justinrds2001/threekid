@@ -6,7 +6,10 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
 import java.util.Set;
 
 import org.junit.jupiter.api.Test;
@@ -19,10 +22,11 @@ import nl.justin.threekid.infrastructure.InMemoryPersonRepository;
 class PersonServiceTest {
 
 	private static final PersonId ADA = new PersonId(1);
-	private static final Clock CLOCK = Clock.fixed(Instant.parse("2026-11-22T12:00:00Z"), ZoneOffset.UTC);
+	private static final PersonId BOB = new PersonId(2);
 
+	private final MutableClock clock = new MutableClock(Instant.parse("2026-11-22T12:00:00Z"));
 	private final PersonRepository repository = new InMemoryPersonRepository();
-	private final PersonService service = new PersonService(repository, CLOCK);
+	private final PersonService service = new PersonService(repository, clock);
 
 	@Test
 	void storesANewPerson() {
@@ -125,11 +129,77 @@ class PersonServiceTest {
 		assertThat(service.save(person(ADA, "Ada"))).isEmpty();
 	}
 
+	@Test
+	void dropsAMatchWhenAChildSwitchesToAnotherParent() {
+		saveFamily(LocalDate.of(2015, 1, 1));
+
+		var matches = service.save(child(new PersonId(12), LocalDate.of(1990, 1, 1), new PersonId(3)));
+
+		assertThat(matches).isEmpty();
+	}
+
+	@Test
+	void matchesWhenOnlyAChildRecordCompletesTheFamily() {
+		service.save(new Person(ADA, "Ada", null, Set.of(), BOB, Set.of()));
+		service.save(child(new PersonId(10), LocalDate.of(2015, 1, 1), BOB));
+		service.save(child(new PersonId(11), LocalDate.of(1990, 1, 1), BOB));
+		service.save(child(new PersonId(12), LocalDate.of(1990, 1, 1), new PersonId(3)));
+
+		var matches = service.save(child(new PersonId(12), LocalDate.of(1990, 1, 1), BOB));
+
+		assertThat(matches).extracting(Person::id).containsExactlyInAnyOrder(ADA, BOB);
+	}
+
+	@Test
+	void stopsMatchingOnceTheYoungestChildTurns18() {
+		var matches = saveFamily(LocalDate.of(2008, 11, 23));
+		assertThat(matches).isNotEmpty();
+
+		clock.advanceOneDay();
+
+		assertThat(service.save(person(new PersonId(99), "Unrelated"))).isEmpty();
+	}
+
+	private List<Person> saveFamily(LocalDate youngestBirthDate) {
+		service.save(new Person(ADA, "Ada", null, Set.of(), BOB, Set.of()));
+		service.save(child(new PersonId(10), youngestBirthDate, BOB));
+		service.save(child(new PersonId(11), LocalDate.of(1990, 1, 1), BOB));
+		return service.save(child(new PersonId(12), LocalDate.of(1990, 1, 1), BOB));
+	}
+
 	private static Person child(PersonId id, LocalDate birthDate, PersonId otherParent) {
 		return new Person(id, null, birthDate, Set.of(ADA, otherParent), null, Set.of());
 	}
 
 	private static Person person(PersonId id, String name) {
 		return new Person(id, name, null, Set.of(), null, Set.of());
+	}
+
+	private static final class MutableClock extends Clock {
+
+		private Instant instant;
+
+		MutableClock(Instant instant) {
+			this.instant = instant;
+		}
+
+		void advanceOneDay() {
+			instant = instant.plus(1, ChronoUnit.DAYS);
+		}
+
+		@Override
+		public Instant instant() {
+			return instant;
+		}
+
+		@Override
+		public ZoneId getZone() {
+			return ZoneOffset.UTC;
+		}
+
+		@Override
+		public Clock withZone(ZoneId zone) {
+			throw new UnsupportedOperationException();
+		}
 	}
 }
