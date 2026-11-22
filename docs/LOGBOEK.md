@@ -7,7 +7,7 @@
 | 1. Opzet | 2026-11-22 | 20 min |
 | 2. Domein en matcher | 2026-11-22 | 15 min |
 | 3. Opslag en upsert | 2026-11-22 | 15 min |
-| 4. Bidirectionele integriteit | | |
+| 4. Bidirectionele integriteit | 2026-11-22 | 30 min |
 | 5. REST-endpoint | | |
 | 6. Performance | | |
 | 7. Fase 2 | | |
@@ -29,3 +29,5 @@ Per open punt in de opdracht: de vraag, de opties die ik heb overwogen, mijn keu
 | 7 | Iemand is zijn eigen kind, ouder of partner, dubbele kinderen, ontbrekend `id` | Alles in de web-laag, of splitsen | `400`, gesplitst | Zelfverwijzing en maximaal 2 ouders zijn regels van het domein. Dubbele kinderen en een ontbrekend `id` zijn invoerfouten en worden gevalideerd op de DTO. |
 | 8 | Peildatum voor "jonger dan 18" | Vandaag, of een datum in het request | Vandaag via een `Clock`-bean | Het request heeft geen peildatum. Met een `Clock` kunnen tests de datum vastzetten. |
 | 9 | Opslag | In-memory, of een database | In-memory, data verdwijnt bij een herstart | Past bij de omvang van de casus. De port maakt een database later een losse adapter. |
+| 10 | Body bij `444` | Leeg, of een melding | Leeg | `444` zegt al dat er geen match is. Een body voegt niets toe. |
+| 11 | Onbekende velden in de response | Als `null` tonen, of weglaten | Als `null` tonen | Elke persoon heeft zo dezelfde vorm, en "onbekend" is expliciet. |
