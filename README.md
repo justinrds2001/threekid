@@ -61,6 +61,8 @@ Every open question in the assignment, with the options I weighed and why I chos
 
 About 2 hours and 45 minutes, against an estimate of 2 hours. The breakdown per step is in [`docs/LOGBOEK.md`](docs/LOGBOEK.md). Most of the extra time went into relation repair (step 4) and performance (step 6). I skipped phase 2 to stay close to the estimate.
 
+Before starting, I spent about 2 hours refreshing my Java and trying things out in a small Spring project, since my background is PHP/Laravel. That time is not included above.
+
 ## Performance
 
 `./gradlew benchmark` fills the store with 10,000 people (2,500 couples with two children each) and measures the average of 1,000 POSTs through MockMvc, after 1,000 warm-up POSTs. Each POST updates an existing parent. The normal build skips this test.
