@@ -3,6 +3,8 @@ package nl.justin.threekid.web;
 import java.util.Comparator;
 import java.util.List;
 
+import jakarta.validation.Valid;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,7 +26,7 @@ public class PersonController {
 	}
 
 	@PostMapping
-	public ResponseEntity<List<PersonResponse>> save(@RequestBody PersonRequest request) {
+	public ResponseEntity<List<PersonResponse>> save(@Valid @RequestBody PersonRequest request) {
 		var matches = service.save(request.toDomain());
 		if (matches.isEmpty()) {
 			return ResponseEntity.status(NO_MATCH).build();

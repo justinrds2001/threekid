@@ -14,10 +14,12 @@ import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import org.springframework.test.web.servlet.assertj.MvcTestResult;
+import org.springframework.test.web.servlet.assertj.MvcTestResultAssert;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -58,6 +60,53 @@ class PersonControllerIntegrationTest {
 				   "children": [{"id": 10}, {"id": 11}, {"id": 12}]}
 				]
 				""");
+	}
+
+	@Test
+	void rejectsAPersonWithoutId() {
+		assertBadRequest("""
+				{"name": "Ada"}
+				""");
+	}
+
+	@Test
+	void rejectsAReferenceWithoutId() {
+		assertBadRequest("""
+				{"id": 1, "partner": {}}
+				""");
+	}
+
+	@Test
+	void rejectsDuplicateChildren() {
+		assertBadRequest("""
+				{"id": 1, "children": [{"id": 10}, {"id": 10}]}
+				""");
+	}
+
+	@Test
+	void rejectsTheSameParentTwice() {
+		assertBadRequest("""
+				{"id": 1, "parent1": {"id": 2}, "parent2": {"id": 2}}
+				""");
+	}
+
+	@Test
+	void rejectsMalformedJson() {
+		assertBadRequest("""
+				{"id": 1, "birthDate": "not a date"}
+				""");
+	}
+
+	@Test
+	void rejectsAPersonWhoIsTheirOwnPartner() {
+		assertBadRequest("""
+				{"id": 1, "partner": {"id": 1}}
+				""").bodyJson().extractingPath("$.detail")
+				.isEqualTo("Person 1 cannot be their own parent, child or partner");
+	}
+
+	private MvcTestResultAssert assertBadRequest(String json) {
+		return assertThat(post(json)).hasStatus(HttpStatus.BAD_REQUEST).hasContentType(MediaType.APPLICATION_PROBLEM_JSON);
 	}
 
 	private MvcTestResult post(String json) {

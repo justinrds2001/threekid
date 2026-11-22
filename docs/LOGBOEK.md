@@ -31,3 +31,5 @@ Per open punt in de opdracht: de vraag, de opties die ik heb overwogen, mijn keu
 | 9 | Opslag | In-memory, of een database | In-memory, data verdwijnt bij een herstart | Past bij de omvang van de casus. De port maakt een database later een losse adapter. |
 | 10 | Body bij `444` | Leeg, of een melding | Leeg | `444` zegt al dat er geen match is. Een body voegt niets toe. |
 | 11 | Onbekende velden in de response | Als `null` tonen, of weglaten | Als `null` tonen | Elke persoon heeft zo dezelfde vorm, en "onbekend" is expliciet. |
+| 12 | Body bij `400` en `409` | `ProblemDetail` (RFC 9457), of leeg | `ProblemDetail` | Standaard foutformaat dat in Spring zit. De client ziet waarom het request is geweigerd. |
+| 13 | `parent1` en `parent2` met hetzelfde id | `400`, of toestaan als één ouder | `400` | Zelfde soort fout als dubbele kinderen. Anders verdwijnt er stil een ouder. |
