@@ -1,24 +1,28 @@
 package nl.justin.threekid.domain;
 
 import java.time.LocalDate;
-import java.util.Map;
+import java.util.Optional;
+import java.util.function.Function;
 
 public class FamilyPatternMatcher {
 
 	private static final int ADULT_AGE = 18;
 
-	public boolean matches(Person candidate, Map<PersonId, Person> people, LocalDate today) {
+	public boolean hasFamilyShape(Person candidate, Function<PersonId, Optional<Person>> lookup) {
 		var partner = candidate.partner();
 		if (partner == null || candidate.children().size() != 3) {
 			return false;
 		}
-		var children = candidate.children().stream().map(people::get).toList();
-		return children.stream().allMatch(child -> hasParent(child, partner))
-				&& children.stream().anyMatch(child -> isUnderAge(child, today));
+		return candidate.children().stream()
+				.map(lookup)
+				.allMatch(child -> child.filter(c -> c.parents().contains(partner)).isPresent());
 	}
 
-	private static boolean hasParent(Person child, PersonId parent) {
-		return child != null && child.parents().contains(parent);
+	public boolean hasUnderAgeChild(Person candidate, Function<PersonId, Optional<Person>> lookup, LocalDate today) {
+		return candidate.children().stream()
+				.map(lookup)
+				.flatMap(Optional::stream)
+				.anyMatch(child -> isUnderAge(child, today));
 	}
 
 	private static boolean isUnderAge(Person child, LocalDate today) {

@@ -3,8 +3,6 @@ package nl.justin.threekid.application;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
@@ -31,10 +29,10 @@ public class PersonService {
 	}
 
 	private List<Person> findMatches() {
-		var people = repository.findAll().stream().collect(Collectors.toMap(Person::id, Function.identity()));
 		var today = LocalDate.now(clock);
-		return people.values().stream()
-				.filter(candidate -> matcher.matches(candidate, people, today))
+		return repository.findAll().stream()
+				.filter(candidate -> matcher.hasFamilyShape(candidate, repository::findById))
+				.filter(candidate -> matcher.hasUnderAgeChild(candidate, repository::findById, today))
 				.toList();
 	}
 }
