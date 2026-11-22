@@ -5,7 +5,7 @@
 | Stap | Datum | Tijd |
 | --- | --- | --- |
 | 1. Opzet | 2026-11-22 | 20 min |
-| 2. Domein en matcher | | |
+| 2. Domein en matcher | 2026-11-22 | 15 min |
 | 3. Opslag en upsert | | |
 | 4. Bidirectionele integriteit | | |
 | 5. REST-endpoint | | |
