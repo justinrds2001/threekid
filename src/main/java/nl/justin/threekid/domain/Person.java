@@ -31,6 +31,10 @@ public record Person(
 		return new Person(id, name, birthDate, parents, partner, plus(children, child));
 	}
 
+	public Person withPartner(PersonId newPartner) {
+		return new Person(id, name, birthDate, parents, newPartner, children);
+	}
+
 	private static Set<PersonId> plus(Set<PersonId> ids, PersonId id) {
 		var copy = new HashSet<>(ids);
 		copy.add(id);

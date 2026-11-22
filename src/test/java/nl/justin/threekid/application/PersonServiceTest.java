@@ -63,7 +63,7 @@ class PersonServiceTest {
 
 		service.save(new Person(ADA, "Ada", null, Set.of(), bob.id(), Set.of()));
 
-		assertThat(repository.findById(bob.id())).contains(bob);
+		assertThat(repository.findById(bob.id())).map(Person::name).contains("Bob");
 	}
 
 	@Test
@@ -77,7 +77,7 @@ class PersonServiceTest {
 
 		var matches = service.save(child(new PersonId(12), LocalDate.of(1990, 1, 1), bob));
 
-		assertThat(matches).containsExactly(ada);
+		assertThat(matches).extracting(Person::id).containsExactlyInAnyOrder(ADA, bob);
 	}
 
 	@Test

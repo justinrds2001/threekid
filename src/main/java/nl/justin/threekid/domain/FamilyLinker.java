@@ -15,9 +15,17 @@ public class FamilyLinker {
 		incoming.children().forEach(child -> changes.update(child, c -> c.withParent(incoming.id())));
 		incoming.parents().forEach(parent -> changes.update(parent, p -> p.withChild(incoming.id())));
 		if (incoming.partner() != null) {
-			changes.update(incoming.partner(), UnaryOperator.identity());
+			linkPartner(incoming, changes);
 		}
 		return changes.toList();
+	}
+
+	private static void linkPartner(Person incoming, Changes changes) {
+		var previousPartner = changes.current(incoming.partner()).partner();
+		if (previousPartner != null && !previousPartner.equals(incoming.id())) {
+			changes.update(previousPartner, p -> p.withPartner(null));
+		}
+		changes.update(incoming.partner(), p -> p.withPartner(incoming.id()));
 	}
 
 	private static final class Changes {
@@ -41,7 +49,7 @@ public class FamilyLinker {
 			return List.copyOf(people.values());
 		}
 
-		private Person current(PersonId id) {
+		Person current(PersonId id) {
 			var changed = people.get(id);
 			return changed != null ? changed : lookup.apply(id).orElseGet(() -> Person.placeholder(id));
 		}
