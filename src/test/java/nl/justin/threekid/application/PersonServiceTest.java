@@ -107,6 +107,20 @@ class PersonServiceTest {
 	}
 
 	@Test
+	void matchesAPlaceholderThroughLinksFromOtherRecords() {
+		var bob = new PersonId(2);
+		service.save(new Person(ADA, "Ada", null, Set.of(), bob, Set.of()));
+		service.save(child(new PersonId(10), LocalDate.of(2015, 1, 1), bob));
+		service.save(child(new PersonId(11), LocalDate.of(1990, 1, 1), bob));
+
+		var matches = service.save(child(new PersonId(12), LocalDate.of(1990, 1, 1), bob));
+
+		assertThat(matches).filteredOn(person -> person.id().equals(bob))
+				.singleElement()
+				.satisfies(placeholder -> assertThat(placeholder.name()).isNull());
+	}
+
+	@Test
 	void returnsNobodyWhenNoOneMatches() {
 		assertThat(service.save(person(ADA, "Ada"))).isEmpty();
 	}
