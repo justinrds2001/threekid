@@ -22,6 +22,9 @@ public record Person(
 		if (parents.size() > MAX_PARENTS) {
 			throw new TooManyParentsException(id);
 		}
+		if (parents.contains(id) || children.contains(id) || id.equals(partner)) {
+			throw new SelfReferenceException(id);
+		}
 	}
 
 	public static Person placeholder(PersonId id) {
