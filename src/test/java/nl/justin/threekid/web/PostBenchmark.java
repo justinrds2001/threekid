@@ -61,7 +61,11 @@ class PostBenchmark {
 		var json = """
 				{"id": %d, "partner": {"id": %d}, "children": [{"id": %d}, {"id": %d}]}
 				""".formatted(id, id + 1, id + 2, id + 3);
-		assertThat(mvc.post().uri("/api/v1/people").contentType(MediaType.APPLICATION_JSON).content(json).exchange())
-				.hasStatus(444);
+		var result = mvc.post()
+				.uri("/api/v1/people")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(json)
+				.exchange();
+		assertThat(result).hasStatus(444);
 	}
 }

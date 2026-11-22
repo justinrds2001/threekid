@@ -59,14 +59,20 @@ class FamilyLinkerTest {
 
 	@Test
 	void unlinksAChildTheUpdateLeavesOut() {
-		var result = link(person(ADA, Set.of(), Set.of()), person(ADA, Set.of(), Set.of(KID)), person(KID, Set.of(ADA), Set.of()));
+		var previous = person(ADA, Set.of(), Set.of(KID));
+		var kid = person(KID, Set.of(ADA), Set.of());
+
+		var result = link(person(ADA, Set.of(), Set.of()), previous, kid);
 
 		assertThat(result.get(KID).parents()).isEmpty();
 	}
 
 	@Test
 	void unlinksAParentTheUpdateLeavesOut() {
-		var result = link(person(KID, Set.of(), Set.of()), person(KID, Set.of(ADA), Set.of()), person(ADA, Set.of(), Set.of(KID)));
+		var previous = person(KID, Set.of(ADA), Set.of());
+		var ada = person(ADA, Set.of(), Set.of(KID));
+
+		var result = link(person(KID, Set.of(), Set.of()), previous, ada);
 
 		assertThat(result.get(ADA).children()).isEmpty();
 	}
@@ -80,7 +86,9 @@ class FamilyLinkerTest {
 
 	@Test
 	void unlinksThePreviousPartnerWhenSwitchingPartners() {
-		var result = link(partnered(ADA, CAROL), partnered(ADA, BOB), partnered(BOB, ADA), partnered(CAROL, null));
+		var incoming = partnered(ADA, CAROL);
+
+		var result = link(incoming, partnered(ADA, BOB), partnered(BOB, ADA), partnered(CAROL, null));
 
 		assertThat(result.get(BOB).partner()).isNull();
 		assertThat(result.get(CAROL).partner()).isEqualTo(ADA);

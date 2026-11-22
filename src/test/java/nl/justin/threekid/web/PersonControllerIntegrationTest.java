@@ -116,11 +116,17 @@ class PersonControllerIntegrationTest {
 	}
 
 	private MvcTestResultAssert assertBadRequest(String json) {
-		return assertThat(post(json)).hasStatus(HttpStatus.BAD_REQUEST).hasContentType(MediaType.APPLICATION_PROBLEM_JSON);
+		return assertThat(post(json))
+				.hasStatus(HttpStatus.BAD_REQUEST)
+				.hasContentType(MediaType.APPLICATION_PROBLEM_JSON);
 	}
 
 	private MvcTestResult post(String json) {
-		return mvc.post().uri("/api/v1/people").contentType(MediaType.APPLICATION_JSON).content(json).exchange();
+		return mvc.post()
+				.uri("/api/v1/people")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(json)
+				.exchange();
 	}
 
 	private static String child(long id, String birthDate) {

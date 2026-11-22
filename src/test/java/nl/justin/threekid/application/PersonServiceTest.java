@@ -67,7 +67,7 @@ class PersonServiceTest {
 
 	@Test
 	void doesNotReplaceAKnownPersonWithAPlaceholder() {
-		var bob = person(new PersonId(2), "Bob");
+		var bob = person(BOB, "Bob");
 		service.save(bob);
 
 		service.save(new Person(ADA, "Ada", null, Set.of(), bob.id(), Set.of()));
@@ -89,40 +89,29 @@ class PersonServiceTest {
 
 	@Test
 	void returnsThePeopleWhoMatchThePatternAfterSaving() {
-		var bob = new PersonId(2);
 		var children = Set.of(new PersonId(10), new PersonId(11), new PersonId(12));
-		var ada = new Person(ADA, "Ada", null, Set.of(), bob, children);
+		var ada = new Person(ADA, "Ada", null, Set.of(), BOB, children);
 		service.save(ada);
-		service.save(child(new PersonId(10), LocalDate.of(2015, 1, 1), bob));
-		service.save(child(new PersonId(11), LocalDate.of(1990, 1, 1), bob));
+		service.save(child(new PersonId(10), LocalDate.of(2015, 1, 1), BOB));
+		service.save(child(new PersonId(11), LocalDate.of(1990, 1, 1), BOB));
 
-		var matches = service.save(child(new PersonId(12), LocalDate.of(1990, 1, 1), bob));
+		var matches = service.save(child(new PersonId(12), LocalDate.of(1990, 1, 1), BOB));
 
-		assertThat(matches).extracting(Person::id).containsExactlyInAnyOrder(ADA, bob);
+		assertThat(matches).extracting(Person::id).containsExactlyInAnyOrder(ADA, BOB);
 	}
 
 	@Test
 	void matchesAParentWhoseChildrenAreKnownOnlyFromTheChildRecords() {
-		var bob = new PersonId(2);
-		service.save(new Person(ADA, "Ada", null, Set.of(), bob, Set.of()));
-		service.save(child(new PersonId(10), LocalDate.of(2015, 1, 1), bob));
-		service.save(child(new PersonId(11), LocalDate.of(1990, 1, 1), bob));
-
-		var matches = service.save(child(new PersonId(12), LocalDate.of(1990, 1, 1), bob));
+		var matches = saveFamily(LocalDate.of(2015, 1, 1));
 
 		assertThat(matches).extracting(Person::id).contains(ADA);
 	}
 
 	@Test
 	void matchesAPlaceholderThroughLinksFromOtherRecords() {
-		var bob = new PersonId(2);
-		service.save(new Person(ADA, "Ada", null, Set.of(), bob, Set.of()));
-		service.save(child(new PersonId(10), LocalDate.of(2015, 1, 1), bob));
-		service.save(child(new PersonId(11), LocalDate.of(1990, 1, 1), bob));
+		var matches = saveFamily(LocalDate.of(2015, 1, 1));
 
-		var matches = service.save(child(new PersonId(12), LocalDate.of(1990, 1, 1), bob));
-
-		assertThat(matches).filteredOn(person -> person.id().equals(bob))
+		assertThat(matches).filteredOn(person -> person.id().equals(BOB))
 				.singleElement()
 				.satisfies(placeholder -> assertThat(placeholder.name()).isNull());
 	}
@@ -170,7 +159,8 @@ class PersonServiceTest {
 		try (var executor = Executors.newFixedThreadPool(8)) {
 			IntStream.range(0, children).forEach(i -> executor.submit(() -> {
 				start.await();
-				return service.save(new Person(new PersonId(100 + i), null, null, Set.of(ADA), null, Set.of()));
+				var child = new Person(new PersonId(100 + i), null, null, Set.of(ADA), null, Set.of());
+				return service.save(child);
 			}));
 			start.countDown();
 		}
