@@ -32,6 +32,31 @@ class FamilyPatternMatcherTest {
 		assertThat(matches(null, child(10, YOUNG), child(11, ADULT), child(12, ADULT))).isFalse();
 	}
 
+	@Test
+	void doesNotMatchPersonWithTwoChildren() {
+		assertThat(matches(PARTNER, child(10, YOUNG), child(11, ADULT))).isFalse();
+	}
+
+	@Test
+	void doesNotMatchPersonWithFourChildren() {
+		assertThat(matches(PARTNER, child(10, YOUNG), child(11, ADULT), child(12, ADULT), child(13, ADULT))).isFalse();
+	}
+
+	@Test
+	void doesNotMatchWhenAChildHasAnotherParentThanThePartner() {
+		var otherParent = new PersonId(3);
+		assertThat(matches(PARTNER, child(10, YOUNG), child(11, ADULT), child(12, ADULT, otherParent))).isFalse();
+	}
+
+	@Test
+	void doesNotMatchWhenAChildRecordIsUnknown() {
+		var known = child(10, YOUNG);
+		var candidate = new Person(CANDIDATE, "Candidate", ADULT, Set.of(), PARTNER,
+				Set.of(known.id(), new PersonId(11), new PersonId(12)));
+		var people = Map.of(CANDIDATE, candidate, known.id(), known);
+		assertThat(matcher.matches(candidate, people, TODAY)).isFalse();
+	}
+
 	private boolean matches(PersonId partner, Person... children) {
 		var childIds = Arrays.stream(children).map(Person::id).collect(Collectors.toSet());
 		var candidate = new Person(CANDIDATE, "Candidate", ADULT, Set.of(), partner, childIds);
