@@ -25,7 +25,11 @@ public record PersonRequest(
 
 	@AssertTrue(message = "children must be unique")
 	public boolean isChildrenUnique() {
-		return children == null || children.stream().map(PersonReference::id).distinct().count() == children.size();
+		if (children == null) {
+			return true;
+		}
+		var distinctIds = children.stream().map(PersonReference::id).distinct().count();
+		return distinctIds == children.size();
 	}
 
 	@AssertTrue(message = "parent1 and parent2 must differ")
@@ -34,11 +38,19 @@ public record PersonRequest(
 	}
 
 	Person toDomain() {
-		var parents = Stream.of(parent1, parent2).filter(Objects::nonNull).map(PersonReference::toDomain)
+		var parents = idsOf(Stream.of(parent1, parent2));
+		Set<PersonId> childIds = children == null ? Set.of() : idsOf(children.stream());
+		return new Person(new PersonId(id), name, birthDate, parents, idOf(partner), childIds);
+	}
+
+	private static Set<PersonId> idsOf(Stream<PersonReference> references) {
+		return references
+				.filter(Objects::nonNull)
+				.map(PersonReference::toDomain)
 				.collect(Collectors.toSet());
-		var childIds = children == null ? Set.<PersonId>of()
-				: children.stream().map(PersonReference::toDomain).collect(Collectors.toSet());
-		var partnerId = partner == null ? null : partner.toDomain();
-		return new Person(new PersonId(id), name, birthDate, parents, partnerId, childIds);
+	}
+
+	private static PersonId idOf(PersonReference reference) {
+		return reference == null ? null : reference.toDomain();
 	}
 }
