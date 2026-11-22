@@ -5,5 +5,5 @@ import java.util.Optional;
 @FunctionalInterface
 public interface PersonLookup {
 
-	Optional<Person> find(PersonId id);
+	Optional<Person> findById(PersonId id);
 }

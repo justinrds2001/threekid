@@ -29,14 +29,14 @@ public class PersonService {
 	}
 
 	public synchronized List<Person> save(Person person) {
-		var changed = linker.link(person, repository::findById);
+		var changed = linker.link(person, repository);
 		changed.forEach(repository::save);
 		changed.forEach(this::reassess);
 		return currentMatches();
 	}
 
 	private void reassess(Person candidate) {
-		if (matcher.hasFamilyShape(candidate, repository::findById)) {
+		if (matcher.hasFamilyShape(candidate, repository)) {
 			familyShaped.add(candidate.id());
 		} else {
 			familyShaped.remove(candidate.id());
@@ -48,7 +48,7 @@ public class PersonService {
 		return familyShaped.stream()
 				.map(repository::findById)
 				.flatMap(Optional::stream)
-				.filter(candidate -> matcher.hasUnderAgeChild(candidate, repository::findById, today))
+				.filter(candidate -> matcher.hasUnderAgeChild(candidate, repository, today))
 				.toList();
 	}
 }

@@ -1,13 +1,9 @@
 package nl.justin.threekid.application;
 
-import java.util.Optional;
-
 import nl.justin.threekid.domain.Person;
-import nl.justin.threekid.domain.PersonId;
+import nl.justin.threekid.domain.PersonLookup;
 
-public interface PersonRepository {
-
-	Optional<Person> findById(PersonId id);
+public interface PersonRepository extends PersonLookup {
 
 	void save(Person person);
 }

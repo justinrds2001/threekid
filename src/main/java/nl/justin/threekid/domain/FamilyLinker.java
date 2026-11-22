@@ -63,7 +63,7 @@ public class FamilyLinker {
 
 		Person current(PersonId id) {
 			var changed = people.get(id);
-			return changed != null ? changed : lookup.find(id).orElseGet(() -> Person.placeholder(id));
+			return changed != null ? changed : lookup.findById(id).orElseGet(() -> Person.placeholder(id));
 		}
 	}
 }

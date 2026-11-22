@@ -13,13 +13,13 @@ public class FamilyPatternMatcher {
 			return false;
 		}
 		return candidate.children().stream()
-				.map(lookup::find)
+				.map(lookup::findById)
 				.allMatch(child -> child.filter(c -> c.parents().contains(partner)).isPresent());
 	}
 
 	public boolean hasUnderAgeChild(Person candidate, PersonLookup lookup, LocalDate today) {
 		return candidate.children().stream()
-				.map(lookup::find)
+				.map(lookup::findById)
 				.flatMap(Optional::stream)
 				.anyMatch(child -> isUnderAge(child, today));
 	}
