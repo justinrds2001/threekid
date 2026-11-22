@@ -1,5 +1,7 @@
 package nl.justin.threekid.infrastructure;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -18,6 +20,11 @@ public class InMemoryPersonRepository implements PersonRepository {
 	@Override
 	public Optional<Person> findById(PersonId id) {
 		return Optional.ofNullable(people.get(id));
+	}
+
+	@Override
+	public Collection<Person> findAll() {
+		return List.copyOf(people.values());
 	}
 
 	@Override
