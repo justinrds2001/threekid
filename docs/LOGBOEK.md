@@ -8,7 +8,7 @@
 | 2. Domein en matcher | 2026-11-22 | 15 min |
 | 3. Opslag en upsert | 2026-11-22 | 15 min |
 | 4. Bidirectionele integriteit | 2026-11-22 | 30 min |
-| 5. REST-endpoint | | |
+| 5. REST-endpoint | 2026-11-22 | 20 min |
 | 6. Performance | | |
 | 7. Fase 2 | | |
 | 8. Afronden | | |
@@ -33,3 +33,4 @@ Per open punt in de opdracht: de vraag, de opties die ik heb overwogen, mijn keu
 | 11 | Onbekende velden in de response | Als `null` tonen, of weglaten | Als `null` tonen | Elke persoon heeft zo dezelfde vorm, en "onbekend" is expliciet. |
 | 12 | Body bij `400` en `409` | `ProblemDetail` (RFC 9457), of leeg | `ProblemDetail` | Standaard foutformaat dat in Spring zit. De client ziet waarom het request is geweigerd. |
 | 13 | `parent1` en `parent2` met hetzelfde id | `400`, of toestaan als één ouder | `400` | Zelfde soort fout als dubbele kinderen. Anders verdwijnt er stil een ouder. |
+| 14 | Hoe meten we een POST met 10.000 personen? | JUnit-test met een eigen Gradle-taak, JMH, of een loadtool zoals `wrk` | JUnit-test, `./gradlew benchmark` | Draait zonder extra installatie en is reproduceerbaar. Genoeg om voor en na te vergelijken. JMH is nauwkeuriger, maar veel opzet voor deze casus. |

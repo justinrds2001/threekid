@@ -25,6 +25,20 @@ dependencies {
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
-tasks.withType<Test> {
-	useJUnitPlatform()
+tasks.test {
+	useJUnitPlatform {
+		excludeTags("benchmark")
+	}
+}
+
+tasks.register<Test>("benchmark") {
+	description = "Measures a POST with 10,000 people in store."
+	group = "verification"
+	testClassesDirs = sourceSets.test.get().output.classesDirs
+	classpath = sourceSets.test.get().runtimeClasspath
+	useJUnitPlatform {
+		includeTags("benchmark")
+	}
+	testLogging.showStandardStreams = true
+	outputs.upToDateWhen { false }
 }
