@@ -13,10 +13,15 @@ public record Person(
 		PersonId partner,
 		Set<PersonId> children) {
 
+	private static final int MAX_PARENTS = 2;
+
 	public Person {
 		Objects.requireNonNull(id, "id");
 		parents = Set.copyOf(parents);
 		children = Set.copyOf(children);
+		if (parents.size() > MAX_PARENTS) {
+			throw new TooManyParentsException(id);
+		}
 	}
 
 	public static Person placeholder(PersonId id) {

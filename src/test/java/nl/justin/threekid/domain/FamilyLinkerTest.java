@@ -1,6 +1,7 @@
 package nl.justin.threekid.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -83,6 +84,14 @@ class FamilyLinkerTest {
 
 		assertThat(result.get(BOB).partner()).isNull();
 		assertThat(result.get(CAROL).partner()).isEqualTo(ADA);
+	}
+
+	@Test
+	void rejectsAThirdParentForAChild() {
+		var kid = person(KID, Set.of(BOB, CAROL), Set.of());
+
+		assertThatThrownBy(() -> link(person(ADA, Set.of(), Set.of(KID)), kid))
+				.isInstanceOf(TooManyParentsException.class);
 	}
 
 	private Map<PersonId, Person> link(Person incoming, Person... stored) {

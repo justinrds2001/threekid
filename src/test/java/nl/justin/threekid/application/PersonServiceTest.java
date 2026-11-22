@@ -1,6 +1,7 @@
 package nl.justin.threekid.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.time.Clock;
 import java.time.Instant;
@@ -12,6 +13,7 @@ import org.junit.jupiter.api.Test;
 
 import nl.justin.threekid.domain.Person;
 import nl.justin.threekid.domain.PersonId;
+import nl.justin.threekid.domain.TooManyParentsException;
 import nl.justin.threekid.infrastructure.InMemoryPersonRepository;
 
 class PersonServiceTest {
@@ -64,6 +66,18 @@ class PersonServiceTest {
 		service.save(new Person(ADA, "Ada", null, Set.of(), bob.id(), Set.of()));
 
 		assertThat(repository.findById(bob.id())).map(Person::name).contains("Bob");
+	}
+
+	@Test
+	void storesNothingWhenAThirdParentIsRejected() {
+		var kid = new PersonId(10);
+		var parents = Set.of(new PersonId(2), new PersonId(3));
+		service.save(new Person(kid, "Kid", null, parents, null, Set.of()));
+
+		assertThatThrownBy(() -> service.save(new Person(ADA, "Ada", null, Set.of(), null, Set.of(kid))))
+				.isInstanceOf(TooManyParentsException.class);
+		assertThat(repository.findById(ADA)).isEmpty();
+		assertThat(repository.findById(kid)).map(Person::parents).contains(parents);
 	}
 
 	@Test
