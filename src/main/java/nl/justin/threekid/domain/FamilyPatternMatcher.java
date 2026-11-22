@@ -6,6 +6,6 @@ import java.util.Map;
 public class FamilyPatternMatcher {
 
 	public boolean matches(Person candidate, Map<PersonId, Person> people, LocalDate today) {
-		return true;
+		return candidate.partner() != null;
 	}
 }

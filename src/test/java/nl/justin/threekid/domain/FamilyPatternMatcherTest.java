@@ -27,6 +27,11 @@ class FamilyPatternMatcherTest {
 		assertThat(matches(PARTNER, child(10, YOUNG), child(11, ADULT), child(12, ADULT))).isTrue();
 	}
 
+	@Test
+	void doesNotMatchPersonWithoutPartner() {
+		assertThat(matches(null, child(10, YOUNG), child(11, ADULT), child(12, ADULT))).isFalse();
+	}
+
 	private boolean matches(PersonId partner, Person... children) {
 		var childIds = Arrays.stream(children).map(Person::id).collect(Collectors.toSet());
 		var candidate = new Person(CANDIDATE, "Candidate", ADULT, Set.of(), partner, childIds);
