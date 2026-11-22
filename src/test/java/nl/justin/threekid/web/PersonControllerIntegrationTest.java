@@ -105,6 +105,16 @@ class PersonControllerIntegrationTest {
 				.isEqualTo("Person 1 cannot be their own parent, child or partner");
 	}
 
+	@Test
+	void answers409WhenAChildWouldGetAThirdParent() {
+		post(child(10, "2015-01-01"));
+
+		assertThat(post("""
+				{"id": 3, "children": [{"id": 10}]}
+				""")).hasStatus(HttpStatus.CONFLICT).hasContentType(MediaType.APPLICATION_PROBLEM_JSON)
+				.bodyJson().extractingPath("$.detail").isEqualTo("Person 10 already has two parents");
+	}
+
 	private MvcTestResultAssert assertBadRequest(String json) {
 		return assertThat(post(json)).hasStatus(HttpStatus.BAD_REQUEST).hasContentType(MediaType.APPLICATION_PROBLEM_JSON);
 	}
